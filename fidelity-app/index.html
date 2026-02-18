@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fidelity | Trading</title>
+<link rel="stylesheet" href="css/auth.css">
+
+<style>
+:root{
+    --primary:#16a34a;
+    --primary-dark:#0f7a36;
+    --bg-light:#f4f6f5;
+    --text-main:#1f2937;
+    --text-muted:#6b7280;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+/* Prevent body scroll to keep it "App-like" */
+html,body{
+    height:100%;
+    overflow:hidden;
+    background:#e5e7eb;
+    display:flex;
+    justify-content:center;
+}
+
+.container{
+    width:100%;
+    max-width:400px;
+    height:100%;
+    background:var(--bg-light);
+    display:flex;
+    flex-direction:column;
+    /* This distributes space evenly if content is short */
+    justify-content: space-between;
+     
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 20px;
+    background:#fff;
+}
+.logo{color:var(--primary);font-size:20px;font-weight:700;}
+.icons span{font-size:18px;margin-left:10px;}
+
+/* CONTENT WRAPPER - This grows to fill space */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around; /* Distributes sections evenly */
+    padding-bottom: 10px;
+}
+
+.hero{
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:#fff;
+    padding:20px;
+    margin:0 10px;
+    border-radius:18px;
+}
+.hero h2{font-size:18px;margin-bottom:5px;}
+.hero p{font-size:12px;opacity:.9;}
+
+/* SLIDERS */
+.slider, .short-slider {
+    margin: 5px 10px;
+    overflow: hidden;
+}
+
+.slider {
+    background:#fff;
+    border-radius:15px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+
+.slide-track, .short-track{
+    display:flex;
+    width:max-content;
+    animation:scroll 18s linear infinite;
+}
+
+.stock{
+    min-width:120px;
+    padding:15px;
+    border-right:1px solid #eee;
+}
+.stock h4{font-size:13px;}
+.price{font-weight:600;color:var(--primary);}
+.change{font-size:11px;color:green;}
+
+/* MANAGE STOCK */
+.section-title{font-size:14px;font-weight:600;padding:5px 15px;}
+
+.promo-card{
+    background:#fff;
+    margin:0 10px;
+    border-radius:15px;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+.promo-left ul{list-style:none;font-size:12px;color:var(--text-muted);}
+.promo-left li::before{content:"✔ ";color:var(--primary);}
+
+.btn{
+    background:var(--primary);
+    color:white;
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+
+}
+
+.short-card{
+    background:#fff;
+    border-radius:15px;
+    padding:12px;
+    margin-right: 10px;
+    min-width:160px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.05);
+}
+.short-card h4{font-size:13px;}
+.short-card p{font-size:11px;color:var(--text-muted);}
+.short-price{font-weight:600;color:var(--primary);margin-top:5px;}
+
+@keyframes scroll{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+}
+
+/* FOOTER - Fixed to bottom naturally */
+.bottom-nav{
+    height:70px;
+    background:#fff;
+    display:flex;
+    border-top:1px solid #eee;
+    padding-bottom: env(safe-area-inset-bottom); /* For iPhone notches */
+}
+
+.nav-item{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    color:var(--text-muted);
+    font-size:11px;
+    cursor:pointer;
+
+}
+.nav-item span{font-size:20px;}
+.nav-item.active{color:var(--primary);font-weight:600;}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">    
+        <div class="logo">Fidelity</div>
+        <div class="icons">
+    <img src="images/spin.png" class="nav-icon" id="spinWheel">
+    <img src="images/wallet.png" class="nav-icon" id="walletBtn">              
+    <span>🔔</span>
+    <span id="profileBtn">👤</span>
+</div>
+
+    </header>
+
+    <div class="main-content">
+        <section class="hero">
+            <h2>Start Trading</h2>
+            <p>Invest in top stocks and track real-time market performance.</p>
+        </section>
+
+        <div class="slider">
+            <div class="slide-track">
+                <div class="stock"><h4>Apple</h4><div class="price">$192.33</div><div class="change">+1.2%</div></div>
+                <div class="stock"><h4>Tesla</h4><div class="price">$244.90</div><div class="change">+2.8%</div></div>
+                <div class="stock"><h4>Amazon</h4><div class="price">$178.20</div><div class="change">+0.9%</div></div>
+                <div class="stock"><h4>Nvidia</h4><div class="price">$721.40</div><div class="change">+3.1%</div></div>
+                <div class="stock"><h4>Apple</h4><div class="price">$192.33</div><div class="change">+1.2%</div></div>
+                <div class="stock"><h4>Tesla</h4><div class="price">$244.90</div><div class="change">+2.8%</div></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-title">Manage Stocks</div>
+            <div class="promo-card">
+                <div class="promo-left">
+                    <ul>
+                        <li>Buy Shares</li>
+                        <li>Sell Stocks</li>
+                        <li>Portfolio Overview</li>
+                    </ul>
+                </div>
+                <div class="btn">Open</div>
+            </div>
+        </div>
+
+        <div class="short-slider">
+            <div class="short-track">
+                <div class="short-card"><h4>Reliance</h4><p>Energy Leader</p><div class="short-price">₹2,845 ▲1.1%</div></div>
+                <div class="short-card"><h4>HDFC Bank</h4><p>Quarterly Growth</p><div class="short-price">₹1,620 ▲0.8%</div></div>
+                <div class="short-card"><h4>Infosys</h4><p>IT Rising</p><div class="short-price">₹1,510 ▲2.3%</div></div>
+                <div class="short-card"><h4>Reliance</h4><p>Energy Leader</p><div class="short-price">₹2,845 ▲1.1%</div></div>
+                <div class="short-card"><h4>HDFC Bank</h4><p>Quarterly Growth</p><div class="short-price">₹1,620 ▲0.8%</div></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active"><span>🏠</span>Homepage</a>
+        <a href="https://www.google.com/finance/beta?hl=en" class="nav-item"><span>📈</span>Market</a>
+        <a href="#" class="nav-item"><span>⭐</span>Reviews</a>
+    </nav>
+</div>
+<script src="js/auth.js"></script>
+</body>
+</html>
