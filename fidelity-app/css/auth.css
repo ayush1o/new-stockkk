@@ -1,0 +1,195 @@
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:#f4f6f5;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.auth-container{
+    background:green;
+    padding:35px;
+    border-radius:18px;
+    width:100%;
+    max-width:380px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    text-align:center;
+}
+
+h2{
+    color:white;
+    margin-bottom:5px;
+}
+
+p{
+    color:white;
+    font-size:14px;
+    margin-bottom:20px;
+}
+
+form{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+input{
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:14px;
+}
+
+input:focus{
+    outline:none;
+    border-color:#16a34a;
+}
+
+button{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:13px;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0f7a36;
+}
+
+.switch{
+    color: white;
+    margin-top:15px;
+    font-size:13px;
+}
+
+.switch a{
+    color:#0f7a;
+    text-decoration:none;
+    font-weight:600;
+}
+/* ================= MARKET OVERLAY ================= */
+
+.market-overlay{
+    position:fixed;
+    inset:0;
+    pointer-events:none; /* allows clicking login form */
+    overflow:hidden;
+    z-index:3;
+}
+
+/* GLASS QUALITY BUBBLE */
+.bubble{
+    position:absolute;
+    padding:14px 20px;
+    border-radius:50px;
+    backdrop-filter:blur(12px);
+    background:rgba(255,255,255,0.35);
+    box-shadow:
+        0 8px 25px rgba(0,0,0,0.08),
+        inset 0 0 10px rgba(255,255,255,0.6);
+    font-weight:600;
+    font-size:13px;
+    white-space:nowrap;
+}
+
+/* ================= UP STOCKS ================= */
+
+.bubble.up{
+    color:#16a34a;
+    animation:rise linear infinite;
+}
+
+/* ================= DOWN STOCKS ================= */
+
+.bubble.down{
+    color:#ef4444;
+    animation:fall linear infinite;
+}
+
+/* RANDOM POSITIONS */
+.bubble:nth-child(1){left:10%; animation-duration:18s;}
+.bubble:nth-child(2){left:70%; animation-duration:22s;}
+.bubble:nth-child(3){left:35%; animation-duration:20s;}
+.bubble:nth-child(4){left:85%; animation-duration:25s;}
+.bubble:nth-child(5){left:20%; animation-duration:21s;}
+.bubble:nth-child(6){left:60%; animation-duration:24s;}
+.bubble:nth-child(7){left:45%; animation-duration:19s;}
+.bubble:nth-child(8){left:80%; animation-duration:23s;}
+
+/* ===== UPWARD MOTION ===== */
+@keyframes rise{
+    from{
+        transform:translateY(110vh) scale(0.9);
+        opacity:0;
+    }
+    10%{opacity:1;}
+    to{
+        transform:translateY(-150px) scale(1.05);
+        opacity:0;
+    }
+}
+
+/* ===== DOWNWARD MOTION ===== */
+@keyframes fall{
+    from{
+        transform:translateY(-150px) scale(1.05);
+        opacity:0;
+    }
+    20%{opacity:1;}
+    to{
+        transform:translateY(110vh) scale(0.9);
+        opacity:0;
+    }
+}
+
+/* KEEP LOGIN ABOVE BUT VISUALLY BLENDED */
+.auth-container{
+    position:relative;
+    z-index:5;
+}
+
+/* keep login card above bubbles */
+.auth-container{
+    position:relative;
+    z-index:2;
+}
+.icons{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.nav-icon{
+    width:22px;
+    height:22px;
+    object-fit:contain;
+    cursor:pointer;
+    transition:transform .2s ease;
+}
+
+.nav-icon:active{
+    transform:scale(0.9);
+}
+.icons{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.nav-icon{
+    width:22px;
+    height:22px;
+    object-fit:contain;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.nav-icon:active{
+    transform:scale(0.9);
+}
+

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Fidelity Login</title>
+
+<link rel="stylesheet" href="css/auth.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* ===== APP STYLE WRAPPER ===== */
+
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:#f4f6f5;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+/* HEADER */
+.header{
+    background:;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #eee;
+}
+
+.logo{
+    color:#16a34a;
+    font-weight:700;
+    font-size:20px;
+}
+
+/* CENTER LOGIN AREA */
+.center-area{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* FOOTER NAV */
+.bottom-nav{
+    height:70px;
+    background:#fff;
+    border-top:1px solid #eee;
+    display:flex;
+}
+
+.nav-item{
+    flex:1;
+    text-decoration:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:#6b7280;
+    font-size:12px;
+}
+
+.nav-item span{
+    font-size:22px;
+}
+
+.nav-item.active{
+    color:#16a34a;
+    font-weight:600;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ✅ HEADER -->
+<header class="header">
+    <div class="logo">Fidelity</div>
+</header>
+
+<!-- ✅ LOGIN CENTER -->
+<div class="center-area">
+
+<div class="auth-container">
+
+    <h2>Welcome Back</h2>
+    <p>Login to your Fidelity account</p>
+
+    <form id="loginForm">
+
+        <input type="email" placeholder="Gmail" required>
+
+        <input type="password" placeholder="Password" required>
+
+        <button type="submit">Login</button>
+
+    </form>
+
+    <div class="switch">
+        Don't have an account ?
+        <a href="signup.html">Sign Up</a>
+    </div>
+
+</div>
+
+</div>
+
+<!-- ✅ FOOTER -->
+<nav class="bottom-nav">
+    <a href="index.html" class="nav-item active">
+        <span>🏠</span>
+        Homepage
+    </a>
+</nav>
+<!-- MARKET BUBBLE OVERLAY -->
+<div class="market-overlay">
+
+    <!-- UP STOCKS (go upward) -->
+    <div class="bubble up">Apple ▲1.2%</div>
+    <div class="bubble up">Tesla ▲2.8%</div>
+    <div class="bubble up">Reliance ▲1.1%</div>
+    <div class="bubble up">Nvidia ▲3.1%</div>
+
+    <!-- DOWN STOCKS (fall downward) -->
+    <div class="bubble down">Meta ▼1.4%</div>
+    <div class="bubble down">Intel ▼0.9%</div>
+    <div class="bubble down">Wipro ▼0.6%</div>
+    <div class="bubble down">Netflix ▼1.2%</div>
+
+</div>
+
+
+<script src="js/auth.js"></script>
+
+</body>
+</html>
