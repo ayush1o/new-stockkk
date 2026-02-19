@@ -1,122 +1,183 @@
-const API_BASE = window.location.origin;
+/* ================= PROFILE CLICK ================= */
 
-function getToken() {
-    return localStorage.getItem('fidelityToken');
-}
+const profileBtn = document.getElementById("profileBtn");
 
-async function apiRequest(path, options = {}) {
-    const token = getToken();
-    const headers = {
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-    };
-
-    if (token) headers.Authorization = `Bearer ${token}`;
-
-    const response = await fetch(`${API_BASE}${path}`, {
-        ...options,
-        headers
-    });
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
-    }
-    return data;
-}
-
-const profileBtn = document.getElementById('profileBtn');
 if (profileBtn) {
-    profileBtn.addEventListener('click', () => {
-        localStorage.removeItem('fidelityToken');
-        localStorage.removeItem('fidelityUser');
-        window.location.href = 'login.html';
+    profileBtn.addEventListener("click", () => {
+        window.location.href = "login.html";
     });
 }
 
-const signup = document.getElementById('signupForm');
+
+/* ================= SIGNUP ================= */
+
+const signup = document.getElementById("signupForm");
+
 if (signup) {
-    signup.addEventListener('submit', async function (e) {
+    signup.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const name = signup.querySelector('input[type="text"]').value.trim();
-        const email = signup.querySelector('input[type="email"]').value.trim().toLowerCase();
-        const passwords = signup.querySelectorAll('input[type="password"]');
-        const password = passwords[0].value;
-        const confirmPassword = passwords[1].value;
+        const email = signup.querySelector('input[type="email"]').value;
+        const password = signup.querySelectorAll('input[type="password"]')[0].value;
 
-        if (password !== confirmPassword) {
-            alert('Passwords do not match ❌');
-            return;
-        }
+        localStorage.setItem("fidelityUser", JSON.stringify({
+            email,
+            password
+        }));
 
-        try {
-            const data = await apiRequest('/auth/signup', {
-                method: 'POST',
-                body: JSON.stringify({ name, email, password })
-            });
-
-            localStorage.setItem('fidelityToken', data.token);
-            localStorage.setItem('fidelityUser', JSON.stringify(data.user));
-
-            alert('Account Created ✅');
-            window.location.href = 'index.html';
-        } catch (error) {
-            alert(error.message);
-        }
+        alert("Account Created ✅");
+        window.location.href = "login.html";
     });
 }
 
-const login = document.getElementById('loginForm');
+
+/* ================= LOGIN ================= */
+
+const login = document.getElementById("loginForm");
+
 if (login) {
-    login.addEventListener('submit', async function (e) {
+    login.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const email = login.querySelector('input[type="email"]').value.trim().toLowerCase();
+        const email = login.querySelector('input[type="email"]').value;
         const password = login.querySelector('input[type="password"]').value;
 
-        try {
-            const data = await apiRequest('/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ email, password })
-            });
+        const savedUser = JSON.parse(localStorage.getItem("fidelityUser"));
 
-            localStorage.setItem('fidelityToken', data.token);
-            localStorage.setItem('fidelityUser', JSON.stringify(data.user));
+        if (savedUser &&
+            savedUser.email === email &&
+            savedUser.password === password) {
 
-            alert('Login Successful ✅');
-            window.location.href = 'index.html';
-        } catch (error) {
-            alert(error.message || 'Invalid Login ❌');
+            alert("Login Successful ✅");
+            window.location.href = "index.html";
+
+        } else {
+            alert("Invalid Login ❌");
         }
     });
 }
+document.getElementById("walletBtn").onclick = () => {
+    window.location.href = "wallet.html";
+};
 
-const walletBtn = document.getElementById('walletBtn');
-if (walletBtn) {
-    walletBtn.onclick = async () => {
-        try {
-            const dashboard = await apiRequest('/dashboard');
-            alert(`Wallet Balance: ₹${dashboard.wallet_balance}`);
-        } catch (error) {
-            alert(error.message);
-        }
-    };
+document.getElementById("spinWheel").onclick = () => {
+    window.location.href = "spin.html";
+};
+/* ================= REVIEW OVERLAY SYSTEM ================= */
+
+const reviewsBtn = document.getElementById("reviewsBtn");
+const overlay = document.getElementById("reviewOverlay");
+const closeBtn = document.getElementById("closeReview");
+
+if (reviewsBtn && overlay) {
+    reviewsBtn.addEventListener("click", function(e){
+        e.preventDefault();
+        overlay.classList.add("active");
+    });
 }
 
-const spinWheel = document.getElementById('spinWheel');
-if (spinWheel) {
-    spinWheel.onclick = async () => {
-        try {
-            const status = await apiRequest('/spin/status');
-            if (!status.can_spin) {
-                alert('Spin unavailable today or deactivated by admin.');
+if (closeBtn) {
+    closeBtn.addEventListener("click", function(){
+        overlay.classList.remove("active");
+    });
+}
+const submitBtn = document.getElementById("submitReview");
+let selectedRating = 0;
+
+
+
+/* ===== STOCK DATA ===== */
+
+const stocks = [
+{ name:"Apple", price:"$192 ▲1.2%", dir:"up", info:"Strong ecosystem growth." },
+{ name:"Tesla", price:"$244 ▼0.8%", dir:"down", info:"EV competition rising." },
+{ name:"Nvidia", price:"$721 ▲3.1%", dir:"up", info:"AI demand booming." },
+{ name:"Amazon", price:"$178 ▲0.9%", dir:"up", info:"AWS profits improving." },
+{ name:"Meta", price:"$498 ▼1.1%", dir:"down", info:"Ad revenue pressure." },
+{ name:"Reliance", price:"₹2845 ▲1.1%", dir:"up", info:"Energy expansion strong." },
+{ name:"Infosys", price:"₹1510 ▼0.6%", dir:"down", info:"IT slowdown fears." },
+{ name:"Google", price:"$142 ▲0.7%", dir:"up", info:"AI integration growing." },
+{ name:"Microsoft", price:"$410 ▲1.9%", dir:"up", info:"Cloud dominance." },
+{ name:"Netflix", price:"$612 ▲2.4%", dir:"up", info:"Subscriber growth." }
+];
+
+let index = 0;
+
+const nameEl = document.getElementById("stockName");
+const priceEl = document.getElementById("stockPrice");
+const infoEl = document.getElementById("stockInfo");
+const starsEl = document.getElementById("stars");
+const msgEl = document.getElementById("msg");
+
+/* Create Stars */
+if (starsEl && starsEl.children.length === 0) {
+    for(let i=1;i<=5;i++){
+        const star=document.createElement("span");
+        star.innerHTML="★";
+        star.className="star";
+        star.dataset.value=i;
+        starsEl.appendChild(star);
+    }
+}
+
+/* Load Stock */
+function loadStock(){
+    if(!nameEl) return;
+
+    const s = stocks[index];
+
+    nameEl.textContent=s.name;
+    priceEl.textContent=s.price;
+    priceEl.className="price "+s.dir;
+    infoEl.textContent=s.info;
+
+    document.querySelectorAll(".star")
+        .forEach(st=>st.classList.remove("active"));
+
+    msgEl.textContent="";
+}
+
+loadStock();
+
+/* Star Click */
+document.addEventListener("click", function(e){
+
+    if(!e.target.classList.contains("star")) return;
+
+    selectedRating = Number(e.target.dataset.value);
+
+    document.querySelectorAll(".star")
+        .forEach((s,i)=>s.classList.toggle("active",i<selectedRating));
+
+    submitBtn.disabled = selectedRating !== 5;
+
+    if(selectedRating !== 5){
+        msgEl.textContent="Give 5⭐ rating to unlock submission";
+    }else{
+        msgEl.textContent="";
+    }
+});
+if(submitBtn){
+    submitBtn.addEventListener("click", ()=>{
+
+        msgEl.innerHTML = "🎉 Commission Earned 💰";
+
+        index++;
+
+        setTimeout(()=>{
+
+            if(index >= stocks.length){
+                alert("All reviews completed ✅");
+                overlay.classList.remove("active");
+                index = 0;
                 return;
             }
-            const result = await apiRequest('/spin/play', { method: 'POST', body: JSON.stringify({}) });
-            alert(`Spin Result: ${result.reward.reward_name}`);
-        } catch (error) {
-            alert(error.message);
-        }
-    };
+
+            loadStock();
+            submitBtn.disabled = true;
+            selectedRating = 0;
+
+        },1200);
+    });
 }
+
