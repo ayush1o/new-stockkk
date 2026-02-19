@@ -1,0 +1,11 @@
+{
+  "name": "new-stockkk",
+  "version": "1.0.0",
+  "description": "Backend and DB integration for Fidelity trading reward platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node --check server.js"
+  }
+}
