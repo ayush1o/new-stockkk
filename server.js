@@ -231,11 +231,13 @@ function isSpinWindowOpen(settings) {
   return true;
 }
 
-function getRandomStockId() {
+function getRandomStockId(excludedIds = []) {
   const rows = db.prepare('SELECT id FROM stocks ORDER BY stock_value DESC').all();
   if (!rows.length) return null;
   const top = rows.slice(0, Math.max(1, Math.floor(rows.length * 0.7)));
-  return top[Math.floor(Math.random() * top.length)].id;
+  const filtered = top.filter((row) => !excludedIds.includes(row.id));
+  const candidatePool = filtered.length ? filtered : top;
+  return candidatePool[Math.floor(Math.random() * candidatePool.length)].id;
 }
 
 function hasPendingAssignment(userId) {
@@ -244,7 +246,14 @@ function hasPendingAssignment(userId) {
 
 function assignStock(userId, assignedByAdmin = 0, stockId = null) {
   if (hasPendingAssignment(userId)) return null;
-  const resolvedStockId = stockId || getRandomStockId();
+
+  let resolvedStockId = stockId;
+  if (!resolvedStockId) {
+    const lastAssigned = db.prepare('SELECT stock_id FROM stock_assignments WHERE user_id = ? ORDER BY id DESC LIMIT 1').get(userId);
+    const excluded = lastAssigned?.stock_id ? [lastAssigned.stock_id] : [];
+    resolvedStockId = getRandomStockId(excluded);
+  }
+
   if (!resolvedStockId) return null;
   db.prepare('INSERT INTO stock_assignments (user_id, stock_id, assigned_by_admin, status) VALUES (?, ?, ?, ?)').run(userId, resolvedStockId, assignedByAdmin, 'pending');
   const assignment = db.prepare(`SELECT sa.id, sa.user_id, sa.stock_id, sa.status, sa.assigned_at, s.stock_name, s.stock_value
@@ -440,15 +449,19 @@ async function route(req, res) {
     const { stock_id, rating, review_text } = body;
     if (Number(rating) !== 5) return json(res, 400, { error: 'Only 5-star reviews are allowed' });
 
-    const pending = db.prepare("SELECT * FROM stock_assignments WHERE user_id = ? AND stock_id = ? AND status = 'pending'").get(auth.userId, stock_id);
-    if (!pending) return json(res, 400, { error: 'No pending assignment for this stock' });
+    const pending = stock_id
+      ? db.prepare("SELECT * FROM stock_assignments WHERE user_id = ? AND stock_id = ? AND status = 'pending'").get(auth.userId, stock_id)
+      : db.prepare("SELECT * FROM stock_assignments WHERE user_id = ? AND status = 'pending' ORDER BY assigned_at DESC LIMIT 1").get(auth.userId);
 
-    db.prepare('INSERT INTO stock_reviews (user_id, stock_id, rating, review_text) VALUES (?, ?, 5, ?)').run(auth.userId, stock_id, review_text || 'Excellent stock');
+    if (!pending) return json(res, 400, { error: 'No pending stock assignment found to review' });
+
+    db.prepare('INSERT INTO stock_reviews (user_id, stock_id, rating, review_text) VALUES (?, ?, 5, ?)').run(auth.userId, pending.stock_id, review_text || 'Excellent stock');
     db.prepare("UPDATE stock_assignments SET status = 'reviewed' WHERE id = ?").run(pending.id);
 
     const nextStock = assignStock(auth.userId);
-    logActivity(auth.userId, 'stock_reviewed', { stock_id });
-    return json(res, 201, { message: 'Review submitted', next_assignment: nextStock });
+    createNotification(auth.userId, 'Stock review submitted successfully. Next stock unlocked.');
+    logActivity(auth.userId, 'stock_reviewed', { stock_id: pending.stock_id });
+    return json(res, 201, { message: 'Review submitted', reviewed_stock_id: pending.stock_id, next_assignment: nextStock });
   }
 
   if (req.method === 'GET' && (url.pathname === '/user/reviews' || url.pathname === '/reviews/history')) {

@@ -42,3 +42,6 @@ Server runs on `http://localhost:3000`.
 
 - `GET /spin/status` and failed `POST /spin/play` now include a `reason` field (e.g. `daily_limit_reached`, `spin_deactivated_by_admin`) for easier debugging.
 - `POST /admin/spin/rewards` validates reward payloads and requires total probability > 0.
+
+- Review submission now accepts omitted `stock_id` and auto-reviews the current pending assignment.
+- Next stock assignment avoids immediately repeating the user's previously assigned stock when possible.
