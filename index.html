@@ -159,6 +159,127 @@ html,body{
     cursor:pointer;
 
 }
+/* ===== REVIEW OVERLAY ===== */
+
+.review-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(6px);
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    transform:translateY(100%);
+    transition:.45s ease;
+    z-index:100;
+}
+
+.review-overlay.active{
+    transform:translateY(0);
+}
+
+/* PREMIUM CARD */
+.review-box{
+    background:linear-gradient(180deg,#ffffff,#f8fafc);
+    width:100%;
+    max-width:400px;
+    border-radius:28px 28px 0 0;
+    padding:24px 20px 28px;
+    box-shadow:0 -10px 40px rgba(0,0,0,0.2);
+    text-align:center;
+    animation:popUp .4s ease;
+}
+
+@keyframes popUp{
+    from{transform:translateY(40px);opacity:.6;}
+    to{transform:translateY(0);opacity:1;}
+}
+
+.review-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:700;
+    font-size:16px;
+    margin-bottom:15px;
+}
+
+.review-header span{
+    cursor:pointer;
+    font-size:18px;
+}
+
+/* STOCK LOOK */
+#stockName{
+    font-size:20px;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.price{
+    font-size:15px;
+    font-weight:600;
+    margin-top:6px;
+}
+
+.price.up{color:#16a34a;}
+.price.down{color:#ef4444;}
+
+.info{
+    font-size:13px;
+    color:#6b7280;
+    margin:12px 0 18px;
+    line-height:1.4;
+}
+
+/* STARS */
+.stars{
+    font-size:34px;
+    letter-spacing:6px;
+    cursor:pointer;
+}
+
+.star{
+    color:#e5e7eb;
+    transition:.2s;
+}
+
+.star.active{
+    color:#facc15;
+    transform:scale(1.15);
+}
+
+/* SUBMIT BUTTON */
+.submit-review{
+    margin-top:20px;
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:14px;
+    background:#16a34a;
+    color:white;
+    font-weight:600;
+    font-size:15px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.submit-review:hover{
+    background:#0f7a36;
+}
+
+.submit-review:disabled{
+    background:#9ca3af;
+    cursor:not-allowed;
+}
+
+/* MESSAGE */
+.message{
+    margin-top:12px;
+    font-size:13px;
+    font-weight:600;
+}
+
 .nav-item span{font-size:20px;}
 .nav-item.active{color:var(--primary);font-weight:600;}
 
@@ -223,9 +344,39 @@ html,body{
     <nav class="bottom-nav">
         <a href="#" class="nav-item active"><span>🏠</span>Homepage</a>
         <a href="https://www.google.com/finance/beta?hl=en" class="nav-item"><span>📈</span>Market</a>
-        <a href="#" class="nav-item"><span>⭐</span>Reviews</a>
-    </nav>
+        <a href="#" class="nav-item" id="reviewsBtn">
+    <span>⭐</span>Reviews
+</a>
+
 </div>
+
+<!-- ================= REVIEW OVERLAY ================= -->
+<div id="reviewOverlay" class="review-overlay">
+
+    <div class="review-box">
+
+        <div class="review-header">
+            ⭐ Review Stocks
+            <span id="closeReview">✕</span>
+        </div>
+
+        <h3 id="stockName"></h3>
+        <div id="stockPrice" class="price"></div>
+        <p id="stockInfo" class="info"></p>
+
+        <div id="stars" class="stars"></div>
+
+<button id="submitReview" class="submit-review" disabled>
+Submit Review
+</button>
+
+<div id="msg" class="message"></div>
+
+
+    </div>
+</div>
+
+
 <script src="js/auth.js"></script>
 </body>
 </html>
