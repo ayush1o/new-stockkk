@@ -1,66 +1,122 @@
-/* ================= PROFILE CLICK ================= */
+const API_BASE = window.location.origin;
 
-const profileBtn = document.getElementById("profileBtn");
+function getToken() {
+    return localStorage.getItem('fidelityToken');
+}
 
+async function apiRequest(path, options = {}) {
+    const token = getToken();
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+    };
+
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        throw new Error(data.error || 'Request failed');
+    }
+    return data;
+}
+
+const profileBtn = document.getElementById('profileBtn');
 if (profileBtn) {
-    profileBtn.addEventListener("click", () => {
-        window.location.href = "login.html";
+    profileBtn.addEventListener('click', () => {
+        localStorage.removeItem('fidelityToken');
+        localStorage.removeItem('fidelityUser');
+        window.location.href = 'login.html';
     });
 }
 
-
-/* ================= SIGNUP ================= */
-
-const signup = document.getElementById("signupForm");
-
+const signup = document.getElementById('signupForm');
 if (signup) {
-    signup.addEventListener("submit", function (e) {
+    signup.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        const email = signup.querySelector('input[type="email"]').value;
-        const password = signup.querySelectorAll('input[type="password"]')[0].value;
+        const name = signup.querySelector('input[type="text"]').value.trim();
+        const email = signup.querySelector('input[type="email"]').value.trim().toLowerCase();
+        const passwords = signup.querySelectorAll('input[type="password"]');
+        const password = passwords[0].value;
+        const confirmPassword = passwords[1].value;
 
-        localStorage.setItem("fidelityUser", JSON.stringify({
-            email,
-            password
-        }));
+        if (password !== confirmPassword) {
+            alert('Passwords do not match ❌');
+            return;
+        }
 
-        alert("Account Created ✅");
-        window.location.href = "login.html";
-    });
-}
+        try {
+            const data = await apiRequest('/auth/signup', {
+                method: 'POST',
+                body: JSON.stringify({ name, email, password })
+            });
 
+            localStorage.setItem('fidelityToken', data.token);
+            localStorage.setItem('fidelityUser', JSON.stringify(data.user));
 
-/* ================= LOGIN ================= */
-
-const login = document.getElementById("loginForm");
-
-if (login) {
-    login.addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const email = login.querySelector('input[type="email"]').value;
-        const password = login.querySelector('input[type="password"]').value;
-
-        const savedUser = JSON.parse(localStorage.getItem("fidelityUser"));
-
-        if (savedUser &&
-            savedUser.email === email &&
-            savedUser.password === password) {
-
-            alert("Login Successful ✅");
-            window.location.href = "index.html";
-
-        } else {
-            alert("Invalid Login ❌");
+            alert('Account Created ✅');
+            window.location.href = 'index.html';
+        } catch (error) {
+            alert(error.message);
         }
     });
 }
-document.getElementById("walletBtn").onclick = () => {
-    window.location.href = "wallet.html";
-};
 
-document.getElementById("spinWheel").onclick = () => {
-    window.location.href = "spin.html";
-};
+const login = document.getElementById('loginForm');
+if (login) {
+    login.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
+        const email = login.querySelector('input[type="email"]').value.trim().toLowerCase();
+        const password = login.querySelector('input[type="password"]').value;
+
+        try {
+            const data = await apiRequest('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password })
+            });
+
+            localStorage.setItem('fidelityToken', data.token);
+            localStorage.setItem('fidelityUser', JSON.stringify(data.user));
+
+            alert('Login Successful ✅');
+            window.location.href = 'index.html';
+        } catch (error) {
+            alert(error.message || 'Invalid Login ❌');
+        }
+    });
+}
+
+const walletBtn = document.getElementById('walletBtn');
+if (walletBtn) {
+    walletBtn.onclick = async () => {
+        try {
+            const dashboard = await apiRequest('/dashboard');
+            alert(`Wallet Balance: ₹${dashboard.wallet_balance}`);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+}
+
+const spinWheel = document.getElementById('spinWheel');
+if (spinWheel) {
+    spinWheel.onclick = async () => {
+        try {
+            const status = await apiRequest('/spin/status');
+            if (!status.can_spin) {
+                alert('Spin unavailable today or deactivated by admin.');
+                return;
+            }
+            const result = await apiRequest('/spin/play', { method: 'POST', body: JSON.stringify({}) });
+            alert(`Spin Result: ${result.reward.reward_name}`);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+}
