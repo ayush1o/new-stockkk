@@ -31,6 +31,7 @@ Server runs on `http://localhost:3000`.
 
 ### Extra admin APIs
 
+- `GET /admin/dashboard` (users, signup/login activity, key stats)
 - `GET /admin/reviews`
 - `GET /admin/activity-logs`
 

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   wallet_balance REAL NOT NULL DEFAULT 0,
   is_admin INTEGER NOT NULL DEFAULT 0,
+  last_login_at TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -90,6 +91,11 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
 `);
+
+const userColumns = db.prepare('PRAGMA table_info(users)').all();
+if (!userColumns.some((col) => col.name === 'last_login_at')) {
+  db.exec('ALTER TABLE users ADD COLUMN last_login_at TEXT');
+}
 
 const settingsCount = db.prepare('SELECT COUNT(*) AS count FROM spin_settings').get().count;
 if (!settingsCount) db.prepare('INSERT INTO spin_settings (is_active, daily_limit) VALUES (0, 1)').run();
@@ -251,6 +257,7 @@ async function route(req, res) {
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get((email || '').toLowerCase());
     if (!user || !verifyPassword(password || '', user.password_hash)) return json(res, 401, { error: 'Invalid credentials' });
     const token = signJwt({ userId: user.id, email: user.email, isAdmin: Boolean(user.is_admin) });
+    db.prepare("UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?").run(user.id);
     logActivity(user.id, 'login', {});
     return json(res, 200, { token, user: { id: user.id, name: user.name, email: user.email, wallet_balance: user.wallet_balance, is_admin: Boolean(user.is_admin) } });
   }
@@ -387,6 +394,30 @@ async function route(req, res) {
     }
     logActivity(auth.userId, 'admin_spin_activate', { is_active, daily_limit });
     return json(res, 200, { message: 'Spin settings updated' });
+  }
+
+  if (req.method === 'GET' && url.pathname === '/admin/dashboard') {
+    const auth = authUser(req);
+    if (!auth || !auth.isAdmin) return json(res, 403, { error: 'Admin only' });
+
+    const users = db.prepare(`SELECT id, name, email, wallet_balance, is_admin, created_at, last_login_at
+      FROM users ORDER BY created_at DESC`).all();
+
+    const authActivity = db.prepare(`SELECT al.id, al.action, al.created_at, u.id as user_id, u.name, u.email
+      FROM activity_logs al
+      LEFT JOIN users u ON u.id = al.user_id
+      WHERE al.action IN ('signup', 'login')
+      ORDER BY al.created_at DESC
+      LIMIT 100`).all();
+
+    const stats = {
+      total_users: db.prepare('SELECT COUNT(*) as count FROM users').get().count,
+      total_reviews: db.prepare('SELECT COUNT(*) as count FROM stock_reviews').get().count,
+      total_spins: db.prepare('SELECT COUNT(*) as count FROM spin_history').get().count,
+      pending_assignments: db.prepare("SELECT COUNT(*) as count FROM stock_assignments WHERE status = 'pending'").get().count
+    };
+
+    return json(res, 200, { stats, users, auth_activity: authActivity });
   }
 
   if (req.method === 'GET' && url.pathname === '/admin/reviews') {
